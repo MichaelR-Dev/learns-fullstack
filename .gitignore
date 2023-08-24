@@ -136,3 +136,6 @@ dist
 pocketbase.exe
 /pb_data
 /pb_migrations
+
+#notes
+notes.md
