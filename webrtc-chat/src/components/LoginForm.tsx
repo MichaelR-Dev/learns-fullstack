@@ -1,56 +1,79 @@
 'use client'
 
 import Image from 'next/image'
+import jwt, { JwtPayload } from 'jsonwebtoken'
+import { useRouter } from 'next/navigation';
 
-const Validator = require('validator');
+const LoginForm = () => {
 
-export default function LoginForm(){
+    const Validator = require('validator');
+    const router = useRouter();
+
+    const handleRedirect = () => {
+        router.push('/dashboard');
+    }
 
     async function loginUser(event: React.FormEvent<HTMLFormElement>): Promise<void>{
-        event.preventDefault();
+
+        try {
+            event.preventDefault();
     
-        const URL: RequestInfo = "http://127.0.0.1:8090/api/collections/users/auth-with-password";
-        const FORMDATA: FormData = new FormData(event.currentTarget);
-        const headers: Headers = new Headers();
-    
-        headers.set('Content-Type', 'application/json')
-    
-        //headers.append('Authorization', `Bearer ${}`)
-    
-        let JSONRequest: any = {};
-        FORMDATA.forEach((value, key) => {
-    
-            if(key === 'email'){
-                value = Validator.normalizeEmail(value);
-            }
-    
-            JSONRequest[key] = Validator.escape(value);
+            const URL: RequestInfo = "http://localhost:3000/api/authentication/login";
+            const FORMDATA: FormData = new FormData(event.currentTarget);
+            const headers: Headers = new Headers();
         
-        });
-    
-        //POST request to auth
-        await fetch(URL, {
-    
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(JSONRequest),
-    
-        })
-        .then(response => response.json())
-        .then(data => document.cookie = `${encodeURIComponent('njsa')}=${encodeURIComponent('Bearer')} ${encodeURIComponent(data.token)}`)
-        .catch(error => {
+            headers.set('Content-Type', 'application/json')
+        
+            let JSONRequest: any = {};
+            FORMDATA.forEach((value, key) => {
+        
+                if(key === 'email'){
+                    value = Validator.normalizeEmail(value);
+                }
+        
+                JSONRequest[key] = Validator.escape(value);
             
-            alert(`Error ${error.code}\n${error.message}`)
-            console.log(error)
+            });
         
-        })
+            //POST request to auth
+            const response = await fetch(URL, {
+        
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(JSONRequest),
+        
+            });
+
+            if(!response.ok)
+                throw new Error('Invalid Login');
+
+            handleRedirect();
+
+        } catch (error: any) {
+
+            alert(`Login Failed`)
+            console.log(error)
+            
+        }
     
     }
     
+    //!----------------------------------------------------
+    //TODO Add proper error handling/popups on frontend
+    //TODO Route to login after successful registering
+    //!----------------------------------------------------
+
     async function registerUser(event: React.FormEvent<HTMLFormElement>): Promise<void>{
+
         event.preventDefault();
+
+        const port = window.location.port;
+        const protocol = window.location.protocol;
+        const domain = window.location.hostname;
+        const path = '/api/authentication/register';
     
-        const URL: RequestInfo = "http://127.0.0.1:8090/api/collections/users/records";
+        const URL: RequestInfo = `${protocol}//${domain}${(port ? ':' + port : '')}${path}`;
+
         const FORMDATA: FormData = new FormData(event.currentTarget);
         const headers: Headers = new Headers();
     
@@ -58,43 +81,32 @@ export default function LoginForm(){
     
     
         if(!Validator.isEmail(FORMDATA.get('email'))){
-    
-            
             alert('Invalid Email');
-    
             return;
-    
         }
     
-        if(Validator.isStrongPassword(FORMDATA.get('password'), 
+        if(!Validator.isStrongPassword(FORMDATA.get('password'), 
         { 
             minLength: 8, 
             minLowercase: 1, 
             minUppercase: 1, 
             minNumbers: 1,
             minSymbols: 1,
-            returnScore: true,
+            returnScore: false,
             pointsPerUnique: 1,
             pointsPerRepeat: 0.5,
             pointsForContainingLower: 10,
             pointsForContainingUpper: 10,
             pointsForContainingNumber: 10,
-            pointsForContainingSymbol: 10 }) < 40){
+            pointsForContainingSymbol: 10 })){
     
-            
             alert('Password not strong');
-    
             return;
-    
         }
     
         if(FORMDATA.get('password') !== FORMDATA.get('passwordConfirm')){
-    
-            
             alert('Password not matching');
-    
             return;
-            
         }
     
         let JSONRequest: any = {};
@@ -116,8 +128,6 @@ export default function LoginForm(){
             body: JSON.stringify(JSONRequest),
     
         })
-        .then(response => response.json())
-        .then(data => console.log(data))
         .catch(error => {
             
             alert(`Error ${error.code}\n${error.message}`)
@@ -156,7 +166,7 @@ export default function LoginForm(){
     return (
         <div className="py-10 pt-5 px-10 mb-5 bg-teal-700 border-4 border-solid border-white">
             
-            <form id='login-panel' className="flex flex-col mx-10 my-10" method='GET' onSubmit={loginUser}>
+            <form id='login-panel' className="flex flex-col mx-10 my-10" method='POST' onSubmit={loginUser}>
 
                 <div className='flex flex-row justify-between place-items-center pb-5'>
                     <Image
@@ -206,3 +216,5 @@ export default function LoginForm(){
         </div>
     )
 }
+
+export default LoginForm;
