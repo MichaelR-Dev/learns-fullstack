@@ -4,10 +4,13 @@
 
 import { NextRequest, NextResponse } from "next/server"
 import jwt from 'jsonwebtoken'
+import { APILogType, SERVERLOG, ServerLogType } from "@/app/util"
 
 export const POST = async (request: NextRequest) => {
 
-    const URL: RequestInfo = "http://127.0.0.1:8090/api/collections/users/auth-with-password";
+    const path: string = '/api/collections/users/auth-with-password'
+    const URL: string | undefined = `${process.env.DB_URL}${path}`
+    
     const newHeaders: Headers = new Headers();
     
     newHeaders.set('Content-Type', 'application/json')
@@ -31,9 +34,23 @@ export const POST = async (request: NextRequest) => {
         let response = new NextResponse();
         response.headers.set('Set-Cookie', `${encodeURIComponent('njsa')}=${encodeURIComponent('Bearer')} ${encodeURIComponent(responseData.token)}; expires=${formattedExpiration}; HttpOnly; Path=/`)
 
+        SERVERLOG({
+            message: `${request.credentials}\n${APILogType.POST} to: ${request.url}`,
+            logType: ServerLogType.API,
+            logDate: new Date(),
+            userData: null
+        })
+        
         return response;
 
     }
+
+    SERVERLOG({
+        message: `${request.credentials}\n${APILogType.POST} to: ${request.url}`,
+        logType: ServerLogType.API,
+        logDate: new Date(),
+        userData: null
+    })
 
     const failResponse = NextResponse.json({ error: 'Invalid Authorization'}, { status: 401 });
     return failResponse;

@@ -1,5 +1,4 @@
 'use client'
-
 import { useRouter } from "next/navigation";
 
  
@@ -10,10 +9,9 @@ export default function Page() {
   let isAuthed: boolean = false;
   const path = isAuthed ? '/dashboard' : '/login'
   
-
   return(
     <>
-      {router.push(path)}
+      { router.push(path) }
     </>
   )
 }

@@ -9,22 +9,17 @@ export default async function Dashboard() {
 
     return (
       <>
-        <div className="flex min-h-screen min-w-screen flex-col items-center p-5 px-10">
+        <div className="flex flex-col h-full w-full items-center p-5 px-10">
             <Header isAuthPage={true}></Header>
   
-            <main className="flex flex-col bg-slate-500">
+            <main className="flex flex-col h-full w-full bg-slate-500">
                 <div className='flex flex-col bg-slate-500'>
                 {/*(messages?.map((message) => {
                     return <Message key={message.id} message={message} />;
                 })*/}
                 </div>
             </main>
-                
-            <Footer/>
         </div>
-        
-  
-        
       </>
     )
   }

@@ -1,16 +1,17 @@
 'use client'
 
 import Image from 'next/image'
-import jwt, { JwtPayload } from 'jsonwebtoken'
 import { useRouter } from 'next/navigation';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginForm = () => {
 
     const Validator = require('validator');
     const router = useRouter();
-
-    const handleRedirect = () => {
-        router.push('/dashboard');
+    
+    const handleRedirect = (path: string) => {
+        router.push(path);
     }
 
     async function loginUser(event: React.FormEvent<HTMLFormElement>): Promise<void>{
@@ -18,7 +19,13 @@ const LoginForm = () => {
         try {
             event.preventDefault();
     
-            const URL: RequestInfo = "http://localhost:3000/api/authentication/login";
+            const port = window.location.port;
+            const protocol = window.location.protocol;
+            const domain = window.location.hostname;
+            const path = '/api/authentication/login';
+        
+            const URL: RequestInfo = `${protocol}//${domain}${(port ? ':' + port : '')}${path}`;
+
             const FORMDATA: FormData = new FormData(event.currentTarget);
             const headers: Headers = new Headers();
         
@@ -44,24 +51,21 @@ const LoginForm = () => {
         
             });
 
-            if(!response.ok)
+            if(!response.ok){
+                LoginFormError('Invalid Login')
                 throw new Error('Invalid Login');
-
-            handleRedirect();
+            }
+                
+            
+                handleRedirect('/dashboard');
 
         } catch (error: any) {
 
-            alert(`Login Failed`)
             console.log(error)
             
         }
     
     }
-    
-    //!----------------------------------------------------
-    //TODO Add proper error handling/popups on frontend
-    //TODO Route to login after successful registering
-    //!----------------------------------------------------
 
     async function registerUser(event: React.FormEvent<HTMLFormElement>): Promise<void>{
 
@@ -81,7 +85,7 @@ const LoginForm = () => {
     
     
         if(!Validator.isEmail(FORMDATA.get('email'))){
-            alert('Invalid Email');
+            LoginFormWarn('Invalid Email format');
             return;
         }
     
@@ -100,12 +104,12 @@ const LoginForm = () => {
             pointsForContainingNumber: 10,
             pointsForContainingSymbol: 10 })){
     
-            alert('Password not strong');
+            LoginFormWarn('Password not strong enough');
             return;
         }
     
         if(FORMDATA.get('password') !== FORMDATA.get('passwordConfirm')){
-            alert('Password not matching');
+            LoginFormWarn('Passwords not matching');
             return;
         }
     
@@ -121,7 +125,7 @@ const LoginForm = () => {
         });
     
         //POST request to auth
-        await fetch(URL, {
+        const response: Response | void = await fetch(URL, {
     
             method: 'POST',
             headers: headers,
@@ -130,10 +134,20 @@ const LoginForm = () => {
         })
         .catch(error => {
             
-            alert(`Error ${error.code}\n${error.message}`)
+            LoginFormError(`Error Code:${error.code}\nInfo:${error.message}`)
             console.log(error)
         
         })
+
+        if(response && response.ok){
+
+            LoginFormSuccess('Successfully Registered')
+            clearFormInputs('register-panel')
+            RegisterRedirect();
+
+        }else if(response){
+            LoginFormError(`Register Error: ${response.status}\n${response.statusText}`)
+        }
     
     }
     
@@ -163,6 +177,76 @@ const LoginForm = () => {
         
     }
 
+    const RegisterRedirect = () => {
+
+        const login_panel: HTMLFormElement = document.querySelector('form#login-panel')!;
+        const register_panel: HTMLFormElement = document.querySelector('form#register-panel')!;
+    
+        register_panel?.classList.remove('flex');
+        register_panel?.classList.add('hidden');
+    
+        login_panel?.classList.remove('hidden');
+        login_panel?.classList.add('flex');
+
+    }
+
+    const LoginFormError = (msg: string) => {
+        toast.error(msg, {
+            position: "bottom-center",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+        });
+    }
+
+    const LoginFormWarn = (msg: string) => {
+        toast.warn(msg, {
+            position: "bottom-center",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+        });
+    }
+
+    const LoginFormSuccess = (msg: string) => {
+        toast.success(msg, {
+            position: "bottom-center",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+        });
+    }
+
+    function clearFormInputs(id: string) {
+
+        try{
+            const form = document.querySelector(`form#${id}`);
+
+            if(!form)
+                throw new Error('Failed to clear input fields');
+
+            const inputs = form.querySelectorAll('input');
+            inputs.forEach(input => {
+              input.value = '';
+            });
+
+        }catch(error){
+            console.error(error);
+        }
+    }
+
     return (
         <div className="py-10 pt-5 px-10 mb-5 bg-teal-700 border-4 border-solid border-white">
             
@@ -183,7 +267,7 @@ const LoginForm = () => {
 
                 <input name="identity" type="email" placeholder='Email' title='Enter Email' className="px-3 py-2 my-2 text-cyan-950 font-medium" required></input>
                 <input name="password" type="password" placeholder='Password' title='Enter Password' className="px-3 py-2 my-2 text-cyan-950 font-medium" required></input>
-                <button id="login_button" type="submit" className="my-2 py-2 bg-cyan-950 border-3 border-solid border-white">Log in</button>
+                <button id="login_button" type="submit" className="my-2 py-2 bg-cyan-950 border-2 border-solid border-cyan-950 hover:bg-cyan-600 hover:border-white">Log in</button>
                 <button type="button" className='mt-5' 
                     onClick={ToggleLoginVisible}
                 >New User? Click here to Register</button>
@@ -208,11 +292,25 @@ const LoginForm = () => {
                 <input name="email" type="email" placeholder='Email' title='Enter Email' className="px-3 py-2 my-2 text-cyan-950 font-medium" required></input>
                 <input name="password" type="password" placeholder='Password' title='Enter Password' className="px-3 py-2 my-2 text-cyan-950 font-medium" required></input>
                 <input name="passwordConfirm" type="password" placeholder='Confirm Password' title='Confirm Password' className="px-3 py-2 my-2 text-cyan-950 font-medium" required></input>
-                <button id="register_button" className="my-2 py-2 bg-cyan-950 border-3 border-solid border-white">Register</button>
+                <button id="register_button" className="my-2 py-2 bg-cyan-950 border-2 border-solid border-cyan-950 hover:bg-cyan-600 hover:border-white">Register</button>
                 <button type="button" className='mt-5' 
                     onClick={ToggleRegisterVisible}
                 >Existing User? Click here to Login</button>
             </form>
+
+            <ToastContainer
+                position="bottom-center"
+                autoClose={2000}
+                limit={3}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+            />
         </div>
     )
 }
