@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation';
+import { RefObject, useRef, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -9,6 +10,11 @@ const LoginForm = () => {
 
     const Validator = require('validator');
     const router = useRouter();
+    const [isLogin, setIsLogin] = useState(true);
+
+    const register_panel: RefObject<HTMLFormElement> = useRef<HTMLFormElement>(null);
+    const login_panel: RefObject<HTMLFormElement> = useRef<HTMLFormElement>(null);
+
     
     const handleRedirect = (path: string) => {
         router.push(path);
@@ -150,43 +156,15 @@ const LoginForm = () => {
         }
     
     }
-    
-    const ToggleLoginVisible: React.MouseEventHandler<HTMLButtonElement> = (event) => {
-    
-        const login_panel: HTMLFormElement = document.querySelector('form#login-panel')!;
-        const register_panel: HTMLFormElement = document.querySelector('form#register-panel')!;
-    
-        login_panel?.classList.remove('flex');
-        login_panel?.classList.add('hidden');
-    
-        register_panel?.classList.remove('hidden');
-        register_panel?.classList.add('flex');
-    
-    }
-    
-    const ToggleRegisterVisible: React.MouseEventHandler<HTMLButtonElement> = (event) => {
-    
-        const login_panel: HTMLFormElement = document.querySelector('form#login-panel')!;
-        const register_panel: HTMLFormElement = document.querySelector('form#register-panel')!;
-    
-        register_panel?.classList.remove('flex');
-        register_panel?.classList.add('hidden');
-    
-        login_panel?.classList.remove('hidden');
-        login_panel?.classList.add('flex');
-        
-    }
+
+    const toggleLoginRegister = () => {setIsLogin(!isLogin)}
 
     const RegisterRedirect = () => {
 
-        const login_panel: HTMLFormElement = document.querySelector('form#login-panel')!;
-        const register_panel: HTMLFormElement = document.querySelector('form#register-panel')!;
+        if(login_panel.current == null || register_panel.current == null)
+            return;
     
-        register_panel?.classList.remove('flex');
-        register_panel?.classList.add('hidden');
-    
-        login_panel?.classList.remove('hidden');
-        login_panel?.classList.add('flex');
+        toggleLoginRegister();
 
     }
 
@@ -250,53 +228,53 @@ const LoginForm = () => {
     return (
         <div className="py-10 pt-5 px-10 mb-5 bg-teal-700 border-4 border-solid border-white">
             
-            <form id='login-panel' className="flex flex-col mx-10 my-10" method='POST' onSubmit={loginUser}>
+            {isLogin ? (
+                <form id='login-panel' ref={login_panel} className="flex flex-col mx-10 my-10" method='POST' onSubmit={loginUser}>
+                    <div className='flex flex-row justify-between place-items-center pb-5'>
+                        <Image
+                        src="/digitbloq.png"
+                        alt="Digitbloq Logo"
+                        className='select-none'
+                        onDragStart={(e)=>{e.preventDefault()}}
+                        width={60}
+                        height={24}
+                        priority
+                        />
+                        <p className='mx-auto text-center text-xl font-bold select-none text-white'>User Log in</p>
+                    </div>
 
-                <div className='flex flex-row justify-between place-items-center pb-5'>
-                    <Image
-                    src="/digitbloq.png"
-                    alt="Digitbloq Logo"
-                    className='select-none'
-                    onDragStart={(e)=>{e.preventDefault()}}
-                    width={60}
-                    height={24}
-                    priority
-                    />
-                    <p className='mx-auto text-center text-xl font-bold select-none text-white'>User Log in</p>
-                </div>
+                    <input name="identity" type="email" placeholder='Email' title='Enter Email' className="px-3 py-2 my-2 text-cyan-950 font-medium" required></input>
+                    <input name="password" type="password" placeholder='Password' title='Enter Password' className="px-3 py-2 my-2 text-cyan-950 font-medium" required></input>
+                    <button id="login_button" type="submit" className="my-2 py-2 bg-cyan-950 border-2 border-solid border-cyan-950 hover:bg-cyan-600 hover:border-white">Log in</button>
+                    <button type="button" className='mt-5' 
+                        onClick={toggleLoginRegister}
+                    >New User? Click here to Register</button>
+                </form>
+            ) : (
+                <form id='register-panel' ref={register_panel} className="flex flex-col mx-10 my-10" method='POST' onSubmit={registerUser}>
+                    <div className='flex flex-row justify-between place-items-center pb-5'>
+                        <Image
+                        src="/digitbloq.png"
+                        alt="Digitbloq Logo"
+                        className='select-none'
+                        onDragStart={(e)=>{e.preventDefault()}}
+                        width={60}
+                        height={24}
+                        priority
+                        />
+                        <p className='mx-auto text-center text-xl font-bold select-none text-white'>User Register</p>
+                    </div>
 
-                <input name="identity" type="email" placeholder='Email' title='Enter Email' className="px-3 py-2 my-2 text-cyan-950 font-medium" required></input>
-                <input name="password" type="password" placeholder='Password' title='Enter Password' className="px-3 py-2 my-2 text-cyan-950 font-medium" required></input>
-                <button id="login_button" type="submit" className="my-2 py-2 bg-cyan-950 border-2 border-solid border-cyan-950 hover:bg-cyan-600 hover:border-white">Log in</button>
-                <button type="button" className='mt-5' 
-                    onClick={ToggleLoginVisible}
-                >New User? Click here to Register</button>
-            </form>
-
-            <form id='register-panel' className="hidden flex-col mx-10 my-10" method='POST' onSubmit={registerUser}>
-
-                <div className='flex flex-row justify-between place-items-center pb-5'>
-                    <Image
-                    src="/digitbloq.png"
-                    alt="Digitbloq Logo"
-                    className='select-none'
-                    onDragStart={(e)=>{e.preventDefault()}}
-                    width={60}
-                    height={24}
-                    priority
-                    />
-                    <p className='mx-auto text-center text-xl font-bold select-none text-white'>User Register</p>
-                </div>
-
-                <input name="username" type="text" placeholder='Username' title='Enter Username' className="px-3 py-2 my-2 text-cyan-950 font-medium" required></input>
-                <input name="email" type="email" placeholder='Email' title='Enter Email' className="px-3 py-2 my-2 text-cyan-950 font-medium" required></input>
-                <input name="password" type="password" placeholder='Password' title='Enter Password' className="px-3 py-2 my-2 text-cyan-950 font-medium" required></input>
-                <input name="passwordConfirm" type="password" placeholder='Confirm Password' title='Confirm Password' className="px-3 py-2 my-2 text-cyan-950 font-medium" required></input>
-                <button id="register_button" className="my-2 py-2 bg-cyan-950 border-2 border-solid border-cyan-950 hover:bg-cyan-600 hover:border-white">Register</button>
-                <button type="button" className='mt-5' 
-                    onClick={ToggleRegisterVisible}
-                >Existing User? Click here to Login</button>
-            </form>
+                    <input name="username" type="text" placeholder='Username' title='Enter Username' className="px-3 py-2 my-2 text-cyan-950 font-medium" required></input>
+                    <input name="email" type="email" placeholder='Email' title='Enter Email' className="px-3 py-2 my-2 text-cyan-950 font-medium" required></input>
+                    <input name="password" type="password" placeholder='Password' title='Enter Password' className="px-3 py-2 my-2 text-cyan-950 font-medium" required></input>
+                    <input name="passwordConfirm" type="password" placeholder='Confirm Password' title='Confirm Password' className="px-3 py-2 my-2 text-cyan-950 font-medium" required></input>
+                    <button id="register_button" className="my-2 py-2 bg-cyan-950 border-2 border-solid border-cyan-950 hover:bg-cyan-600 hover:border-white">Register</button>
+                    <button type="button" className='mt-5' 
+                        onClick={toggleLoginRegister}
+                    >Existing User? Click here to Login</button>
+                </form>
+            )}
 
             <ToastContainer
                 position="bottom-center"

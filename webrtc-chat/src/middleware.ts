@@ -1,43 +1,22 @@
-//!----------------------------------------------------
-//TODO Add logging to server for authentication usage
-//!----------------------------------------------------
-
 import { NextResponse, NextRequest } from 'next/server'
-import { SERVERLOG, ServerLogType, UserData } from './app/util'
+import { SERVERLOG, ServerLogType, SetUser, UserData } from './app/util'
 
-const requireAuth: string[] = ["/admin", "/dashboard", "/chat"]
+const requireAuth: string[] = ["/admin", "/dashboard", "/chat", "/logout"]
 const requireGuest: string[] = ["/login"]
 
 export const middleware = async (request: NextRequest) => {
 
-  const user: UserData = {
-    username: "",
-    email: "",
-    created: "",
-    emailVisibility: false,
-    id: ""
-  }
-
-  const res = NextResponse.next();
+  let res = NextResponse.next();
   const pathname = request.nextUrl.pathname;
   const token: String = request.cookies.get('njsa')?.value || "";
 
-  const SetUser = (data: any) => {
-      if(!data)
-        return;
+  console.log(pathname);
 
-      user.username = data.username;
-      user.email = data.email;
-      user.created = data.created;
-      user.emailVisibility = data.emailVisibility;
-      user.id = data.id;
-
-  }
+  let user: UserData | undefined;
 
   const AuthorizeToken = async (token: String): Promise<boolean> => {
 
     try{
-
       const URL = 'http://127.0.0.1:8090/api/collections/users/records'
       const headers: Headers = new Headers();
       
@@ -56,7 +35,7 @@ export const middleware = async (request: NextRequest) => {
         throw new Error('Invalid authentication');
       }
   
-      SetUser(data.items[0]);
+      user = SetUser(data.items[0]);
       return true;
   
     }catch(error){
@@ -129,6 +108,25 @@ export const middleware = async (request: NextRequest) => {
 
   }
 
+  //! FIX THIS FUCKING PATH
+
+  // if(pathname.includes('/api')){
+  //   return new NextResponse(request.nextUrl, request);
+  // }
+
   return res;
 
+}
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
 }

@@ -1,59 +1,36 @@
 'use client'
 
-import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react';
+import Link from 'next/link';
+import { Dispatch, SetStateAction, useState } from 'react';
 
 export default function Header( {isAuthPage}: any){
-
-    const router: AppRouterInstance = useRouter();
-    const [menuOpen, setMenuOpen] = useState(false);
-
-    const handleLogout = async () => {
-        try{
-
-            const path = '/api/authentication/logout';
-            const response = await fetch(path, {
-                method: 'HEAD'
-            })
-
-            if(!response.ok){
-                throw new Error(response.statusText);
-            }
-
-            router.push('/login')
-
-        }catch(error: any){
-            console.error("Error: Failure on log out")
-        }
-        
-    }
+    const [menuOpen, setMenuOpen]: [boolean, Dispatch<SetStateAction<boolean>>] = useState(false);
 
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
     }
 
     return(
-        <header className="flex flex-row w-full h-10 md:h-20 px-5 py-2 justify-between items-center flex-between border-b-2 border-blue-500">
+        <header className="flex flex-row w-full h-10 md:h-15 px-3 py-2 justify-between items-center border-2 flex-between ">
 
             <div className="flex-1 hidden md:flex justify-start">
 
+                <Image
+                    src="/digitbloq.png"
+                    className="pointer-events-none mr-2"
+                    alt="Digitbloq Logo"
+                    width={25}
+                    height={25}
+                    priority
+                />
+
                 <a
-                    className=" flex place-items-center text-center gap-x-2 font-bold text-xl hover:text-slate-300"
+                    className=" flex place-items-center text-center gap-x-2 font-bold text-xl text-cyan-300 hover:sepia"
                     href="https://www.github.com/michaelr-dev"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    <Image
-                        src="/digitbloq.png"
-                        className="pointer-events-none"
-                        alt="Digitbloq Logo"
-                        width={50}
-                        height={50}
-                        priority
-                    />
-
                     DigitBloq
                 </a>
 
@@ -63,28 +40,46 @@ export default function Header( {isAuthPage}: any){
                 <p className='font-bold text-2xl md:text-xl text-left md:text-center'>WebRTC Chat</p>
             </div>
 
-            <div className='justify-end flex-1 hidden md:flex'>
-                {isAuthPage ? (<button className="logout-button font-bold text-md md:text-xl hover:text-slate-300" onClick={handleLogout}>Log out</button>) : (null)}
+            <div className='hidden md:flex md:flex-1 justify-end z-10 flex-shrink-0'>
+                <p className='mr-3 font-bold text-md'>DensityMVRMVRMVRMVRM</p>
+                <button type="button" className='hover:sepia flex-shrink-0' onClick={toggleMenu}>
+                    <Image
+                        className=' flex-shrink-0 min-w-25 min-h-25'
+                        src="/profile-icon.svg"
+                        alt="Profile icon"
+                        width={25}
+                        height={25}
+                        priority
+                    />
+                </button>
             </div>
 
 
-            <button type="button" className='inline md:hidden z-10' onClick={toggleMenu}>
+            {/*-------------------------Medium Layout Below----------------------------*/}
+
+
+            <button type="button" className='inline md:hidden z-10 hover:sepia' onClick={toggleMenu}>
                 <Image
-                    src={!menuOpen ? "/bars-solid-white.svg" : "/xmark-solid.svg"}
+                    src={!menuOpen ? "/bars-solid-cyan.svg" : "/xmark-solid.svg"}
                     alt="Hamburger menu"
-                    width={20}
-                    height={20}
+                    width={25}
+                    height={25}
                     priority
                 />
             </button>
 
-            <div className="menu-options transition-colors transition-opacity delay-1000 px-12 py-16 w-full h-full absolute left-0 top-0 bg-cyan-600">
-                <ul>
-                    <li>Home</li>
-                    <li>About</li>
-                    <li>Contact</li>
-                </ul>
-            </div>
+            {
+                menuOpen && (
+                    <div className="menu-options px-12 py-16 w-full h-full left-0 top-0 bg-teal-700 border-2 border-solid border-white absolute">
+                        <ul>
+                            <Link href="/logout">Logout</Link>
+                            <li>About</li>
+                            <li>Contact</li>
+                        </ul>
+                    </div>
+                )
+            }
+            
 
         </header>
     )

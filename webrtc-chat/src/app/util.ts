@@ -36,6 +36,22 @@ export type ServerLog = {
     userData: UserData | null | undefined
 }
 
+export const SetUser = (data: any) => {
+    if(!data)
+      return;
+
+    let user: UserData = {
+        username: data.username,
+        email: data.email,
+        created: data.created,
+        emailVisibility: data.emailVisibility,
+        id: data.id,
+    }
+    
+
+    return user
+}
+
 export const SERVERLOG = (log: ServerLog) => {
     console.log(`\x1b[33m[${log.logDate ? log.logDate.toUTCString() : new Date().toUTCString()}]\x1b[0m\n\x1b[36m${log.userData ? `[ID=${log.userData.id} U=${log.userData.username} E=${log.userData.email}]\x1b[0m\n` : ''}${log.logType}: ${log.message}\n`)
 }
