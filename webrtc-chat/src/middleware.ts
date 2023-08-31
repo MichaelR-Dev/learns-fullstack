@@ -10,8 +10,6 @@ export const middleware = async (request: NextRequest) => {
   const pathname = request.nextUrl.pathname;
   const token: String = request.cookies.get('njsa')?.value || "";
 
-  console.log(pathname);
-
   let user: UserData | undefined;
 
   const AuthorizeToken = async (token: String): Promise<boolean> => {
@@ -107,8 +105,6 @@ export const middleware = async (request: NextRequest) => {
     }
 
   }
-
-  //! FIX THIS FUCKING PATH
 
   // if(pathname.includes('/api')){
   //   return new NextResponse(request.nextUrl, request);

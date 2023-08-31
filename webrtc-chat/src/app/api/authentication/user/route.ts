@@ -1,12 +1,5 @@
-//!----------------------------------------------------
-//TODO Add logging to server for route usage
- //! FIX THIS FUCKING PATH
-//!----------------------------------------------------
-
 import { NextRequest, NextResponse } from "next/server"
-import { cookies } from 'next/headers'
 import { APILogType, SERVERLOG, ServerLogType, UserData, SetUser } from "@/app/util"
-import { redirect } from "next/navigation"
 
 export const GET = async (request: NextRequest) => {
 
