@@ -1,7 +1,9 @@
+import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers"
 import { headers } from "next/headers"
 
 export type UserData = {
 
+    avatar: string,
     username: string,
     email: string,
     created: string,
@@ -49,31 +51,25 @@ export type ServerLog = {
     userData: UserData | null | undefined
 }
 
-export async function GetUser() {
-  
-    const location = 'http://127.0.0.1:3000'
-    const path = '/api/authentication/user';
-    const headersList = headers();
-  
-    const URL: RequestInfo = `${location}${path}`;
-  
-    try{
-  
-      const res = await fetch(URL, { method: 'GET', headers: headersList })
-      const resJSON = await res.json();
-  
-      return resJSON;
-  
-    }catch(e: any){
-      console.log(e);
-    }
-  
-    return null;
-  }
+export const GetUser = async () => {
+    const URL = 'http://127.0.0.1:3000/api/authentication/user'
+    const newHeaders = headers();
 
-export const SetUser = (data: UserData) => {
+    const authResponse: Response = await fetch(URL, {method: 'GET', headers: newHeaders});
+    const data: any = await authResponse.json();
+
+    if(authResponse.status > 200){
+      console.log(data);
+      console.log('Invalid Authentication');
+    }
+
+    return data;
+}
+
+export const SetUser = (data: any) => {
 
     let user: UserData = {
+        avatar: data.avatar,
         username: data.username,
         email: data.email,
         created: data.created,

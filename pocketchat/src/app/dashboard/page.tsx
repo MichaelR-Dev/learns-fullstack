@@ -27,8 +27,8 @@ async function getChats() {
 
 export default async function Dashboard() {
 
-  const userFetch = GetUser();
-  const user: UserData = SetUser(await userFetch);
+  const dataJSON = await GetUser();
+  const user: UserData = SetUser(dataJSON);
 
   const chatsFetch = await getChats();
 

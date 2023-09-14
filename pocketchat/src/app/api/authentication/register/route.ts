@@ -1,26 +1,27 @@
 import { APILogType, SERVERLOG, ServerLogType } from "@/app/util";
 import { NextRequest, NextResponse } from "next/server"
+import PocketBase from 'pocketbase';
+
+const pb = new PocketBase(process.env.DB_URL);
 
 export const POST = async (request: NextRequest) => {
 
-    const path: string = '/api/collections/users/records'
-    const URL: string | undefined = `${process.env.DB_URL}${path}`
+    const formData = await request.json();
 
-    const newHeaders: Headers = new Headers();
-    
-    newHeaders.set('Content-Type', 'application/json')
-    
-    const res: Response = await fetch(URL,
-    {
-        method: 'POST',
-        headers: newHeaders,
-        body: request.body
-    })
+    const data = {
+        "username": formData?.username,
+        "email": formData?.email,
+        "emailVisibility": false,
+        "password": formData?.password,
+        "passwordConfirm": formData?.passwordConfirm
+    };
 
-    if(res.ok){
+    const record = await pb.collection('users').create(data);
 
-        const responseData = await res.json()
-        const response = NextResponse.json( responseData );
+    //Optional email verification
+    await pb.collection('users').requestVerification(data.email);
+
+    if(!record.code){
 
         SERVERLOG({
             message: `${request.credentials}\n${APILogType.POST} to: ${request.url}`,
@@ -29,7 +30,8 @@ export const POST = async (request: NextRequest) => {
             userData: null
         })
 
-        return response;
+        const successResponse = NextResponse.json({ error: 'Successfully Registered'}, { status: 200 });
+        return successResponse;
 
     }
 
@@ -40,7 +42,7 @@ export const POST = async (request: NextRequest) => {
         userData: null
     })
 
-    const failResponse = NextResponse.json({ error: 'Invalid Authorization'}, { status: 401 });
+    const failResponse = NextResponse.json({ error: 'Invalid Registry'}, { status: 401 });
     return failResponse;
 
 }

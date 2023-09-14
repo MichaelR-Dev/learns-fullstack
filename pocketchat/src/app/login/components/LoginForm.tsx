@@ -26,7 +26,7 @@ const LoginForm = () => {
             const port = window.location.port;
             const protocol = window.location.protocol;
             const domain = window.location.hostname;
-            const path = '/api/authentication/login';
+            const path = '/api/authentication/user';
         
             const URL: RequestInfo = `${protocol}//${domain}${(port ? ':' + port : '')}${path}`;
 

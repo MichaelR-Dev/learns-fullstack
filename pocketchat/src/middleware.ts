@@ -20,25 +20,20 @@ export const middleware = async (request: NextRequest) => {
 
     try{
 
-      const URL = 'http://127.0.0.1:8090/api/collections/users/records'
+      const URL = 'http://127.0.0.1:3000/api/authentication/user'
       const headers: Headers = new Headers();
       
       headers.set('Content-Type', 'application/json')
-  
-      headers.append('Authorization', `${token}`)
+      headers.append('njsa', `${token}`)
   
       const authResponse: Response = await fetch(URL, {method: 'GET', headers: headers});
       const data: any = await authResponse.json();
   
-      if(!authResponse.ok){
-        throw new Error('Network response was not ok');
-      }
-  
-      if(data.items.length != 1){
-        throw new Error('Invalid authentication');
+      if(authResponse.status > 200){
+        throw new Error('Invalid Authentication');
       }
 
-      user = SetUser(data.items[0]);
+      user = SetUser(data);
       return true;
   
     }catch(error){
@@ -110,10 +105,6 @@ export const middleware = async (request: NextRequest) => {
     }
 
   }
-
-  // if(pathname.includes('/api')){
-  //   return new NextResponse(request.nextUrl, request);
-  // }
 
   return res;
 

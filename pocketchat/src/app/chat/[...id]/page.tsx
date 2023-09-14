@@ -3,6 +3,10 @@ import Header from "@/components/Header";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import Channel from "./components/Channel";
+import PocketBase from 'pocketbase';
+
+const pb = new PocketBase('https://pocketbase.io');
+export const dynamic = 'force-dynamic';
 
 async function getChat(id: string) {
 
