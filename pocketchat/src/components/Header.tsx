@@ -1,11 +1,20 @@
 'use client'
+// @refresh reset
 
+import { UserData } from '@/app/util';
 import Image from 'next/image'
 import Link from 'next/link';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
-export default function Header( {isAuthPage}: any){
+interface HeaderProps {
+    isAuthPage: boolean;
+    newUser: UserData;
+}
+
+const Header: React.FC<HeaderProps> = ({isAuthPage, newUser}: HeaderProps) => {
+
     const [menuOpen, setMenuOpen]: [boolean, Dispatch<SetStateAction<boolean>>] = useState(false);
+    const [user, setUser] = useState(newUser);
 
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
@@ -41,7 +50,7 @@ export default function Header( {isAuthPage}: any){
             </div>
 
             <div className='hidden md:flex md:flex-1 justify-end z-10 flex-shrink-0'>
-                <p className='mr-3 font-bold text-md'>DensityMVRMVRMVRMVRM</p>
+                <p className='mr-3 font-bold text-md'>{user ? user.username : 'guest'}</p>
                 <button type="button" className='hover:sepia flex-shrink-0' onClick={toggleMenu}>
                     <Image
                         className=' flex-shrink-0 min-w-25 min-h-25'
@@ -84,3 +93,5 @@ export default function Header( {isAuthPage}: any){
         </header>
     )
 }
+
+export default Header;

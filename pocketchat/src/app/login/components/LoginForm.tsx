@@ -1,7 +1,6 @@
 'use client'
 
 import Image from 'next/image'
-import { useRouter } from 'next/navigation';
 import { RefObject, useRef, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -9,7 +8,6 @@ import 'react-toastify/dist/ReactToastify.css';
 const LoginForm = () => {
 
     const Validator = require('validator');
-    const router = useRouter();
     const [isLogin, setIsLogin] = useState(true);
 
     const register_panel: RefObject<HTMLFormElement> = useRef<HTMLFormElement>(null);
@@ -17,7 +15,7 @@ const LoginForm = () => {
 
     
     const handleRedirect = (path: string) => {
-        router.push(path);
+        window.location.href = path;
     }
 
     async function loginUser(event: React.FormEvent<HTMLFormElement>): Promise<void>{
@@ -62,7 +60,6 @@ const LoginForm = () => {
                 throw new Error('Invalid Login');
             }
                 
-            
                 handleRedirect('/dashboard');
 
         } catch (error: any) {
@@ -149,7 +146,7 @@ const LoginForm = () => {
 
             LoginFormSuccess('Successfully Registered')
             clearFormInputs('register-panel')
-            RegisterRedirect();
+            toggleLoginRegister();
 
         }else if(response){
             LoginFormError(`Register Error: ${response.status}\n${response.statusText}`)
@@ -158,15 +155,6 @@ const LoginForm = () => {
     }
 
     const toggleLoginRegister = () => {setIsLogin(!isLogin)}
-
-    const RegisterRedirect = () => {
-
-        if(login_panel.current == null || register_panel.current == null)
-            return;
-    
-        toggleLoginRegister();
-
-    }
 
     const LoginFormError = (msg: string) => {
         toast.error(msg, {

@@ -1,3 +1,5 @@
+import { headers } from "next/headers"
+
 export type UserData = {
 
     username: string,
@@ -6,6 +8,17 @@ export type UserData = {
     emailVisibility: boolean,
     id: string
 
+}
+
+export type UserProfile = {
+    avatar: string,
+    created: string,
+    email: string | undefined,
+    emailVisibility: boolean,
+    id: string,
+    updated: string,
+    username: string,
+    verified: false
 }
 
 export enum ServerLogType {
@@ -36,9 +49,29 @@ export type ServerLog = {
     userData: UserData | null | undefined
 }
 
-export const SetUser = (data: any) => {
-    if(!data)
-      return;
+export async function GetUser() {
+  
+    const location = 'http://127.0.0.1:3000'
+    const path = '/api/authentication/user';
+    const headersList = headers();
+  
+    const URL: RequestInfo = `${location}${path}`;
+  
+    try{
+  
+      const res = await fetch(URL, { method: 'GET', headers: headersList })
+      const resJSON = await res.json();
+  
+      return resJSON;
+  
+    }catch(e: any){
+      console.log(e);
+    }
+  
+    return null;
+  }
+
+export const SetUser = (data: UserData) => {
 
     let user: UserData = {
         username: data.username,

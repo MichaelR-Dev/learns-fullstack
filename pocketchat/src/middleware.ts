@@ -1,3 +1,7 @@
+//!-----------------------------------------------------
+//TODO ADD LOGGING FOR USER IN MIDDLEWARE, REMOVE USER LOGGING IN OTHER ROUTES
+//!-----------------------------------------------------
+
 import { NextResponse, NextRequest } from 'next/server'
 import { SERVERLOG, ServerLogType, SetUser, UserData } from './app/util'
 
@@ -15,6 +19,7 @@ export const middleware = async (request: NextRequest) => {
   const AuthorizeToken = async (token: String): Promise<boolean> => {
 
     try{
+
       const URL = 'http://127.0.0.1:8090/api/collections/users/records'
       const headers: Headers = new Headers();
       
@@ -32,7 +37,7 @@ export const middleware = async (request: NextRequest) => {
       if(data.items.length != 1){
         throw new Error('Invalid authentication');
       }
-  
+
       user = SetUser(data.items[0]);
       return true;
   
