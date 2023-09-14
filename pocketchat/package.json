@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "full": "start cmd /k \"npm run dev\" & start cmd /k \"cd .. && pocketbase serve\"",
     "dev": "next dev",
+    "db": "start cmd /k \"cd .. && pocketbase serve\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

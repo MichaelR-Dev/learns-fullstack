@@ -46,7 +46,7 @@ const Header: React.FC<HeaderProps> = ({isAuthPage, newUser}: HeaderProps) => {
             </div>
 
             <div className="flex-1">
-                <p className='font-bold text-2xl md:text-xl text-left md:text-center'>WebRTC Chat</p>
+                <p className='font-bold text-2xl md:text-xl text-left md:text-center'>PocketChat</p>
             </div>
 
             <div className='hidden md:flex md:flex-1 justify-end z-10 flex-shrink-0'>
